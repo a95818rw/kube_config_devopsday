@@ -1,0 +1,43 @@
+env: devopsday
+replicaCount: 8
+
+image:
+  repository: a95818rw/expressdevopsday
+  tag: "202306081741"
+  pullPolicy: Always
+
+deployment:
+  strategy:
+    maxSurge: 25%
+    maxUnavailable: 25%
+  type: RollingUpdate
+
+service:
+  port: 3000
+  internalTrafficPolicy: Cluster
+  ipFamilyPolicy: SingleStack
+  type: ClusterIP
+
+livenessProbe:
+  path: "/health"
+  initialDelaySeconds: 5
+  timeoutSeconds: 1
+  periodSeconds: 10
+  failureThreshold: 3
+
+ingress:
+  hosts:
+    - host: express.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    memory: 512Mi
+    cpu: "1"
+  requests:
+    memory: 256Mi
+    cpu: "0.2"  
+

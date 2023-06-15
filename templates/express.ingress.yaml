@@ -1,16 +1,22 @@
+{{- $svcName := .Release.Name -}}
+{{- $svcPort := .Values.service.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: express-ingress
+  name: {{ .Release.Name  }}-ingress
 spec:
   rules:
-  - host: express.example.com # not necessary
+  {{- range .Values.ingress.hosts }}
+  - host: {{ .host }}
     http:
       paths:
-      - path: /
+      {{- range .paths }}
+      - path: {{ .path }}
         pathType: Prefix
         backend:
           service:
-            name: express
+            name: {{ $svcName }}
             port:
-              number: 3000
+              number: {{ $svcPort }}
+      {{- end }}
+  {{- end }}

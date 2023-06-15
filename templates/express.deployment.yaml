@@ -1,43 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: express
+  name: {{ .Release.Name }}
 spec:
   selector:
     matchLabels:
-      run: express
-  replicas: 8
-  strategy: # not necessary
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
+      {{- include "template.labels" . | nindent 6 }}
+  replicas: {{ .Values.replicaCount }}
+  {{- include "template.strategy" . | nindent 2 }}
   template:
     metadata:
       labels:
-        run: express
+        {{- include "template.labels" . | nindent 8 }}
     spec:
       containers:
-      - name: express
-        image: a95818rw/expressdevopsday:latest
-        imagePullPolicy: Always
+      - name: {{ .Release.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: 3000
+        - containerPort: {{ .Values.service.port }}
           name: http
           protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 5
-          timeoutSeconds: 1
-          periodSeconds: 10
-          failureThreshold: 3
+        {{- include "template.livenessProbe" . | nindent 8 }}
         resources:
-          limits:
-            memory: 512Mi
-            cpu: "1"
-          requests:
-            memory: 256Mi
-            cpu: "0.2"  
-      
+          {{- toYaml .Values.resources | nindent 10 }}
