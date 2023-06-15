@@ -8,3 +8,9 @@ The source code is [here](https://github.com/a95818rw/express_devopsday).
 ```bash
 helm install --debug . --name-template express
 ```
+
+With minikube
+
+```bash
+minikube tunnel
+```
